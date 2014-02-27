@@ -171,6 +171,56 @@ Also Zusammengefasst:
 EAI Patterns
 ============
 
+~~~~~~~~~~~~~~~~~~~~~~~~
+Domain specific language
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Camel verwedet die DSL *fluid builder*.
+
+.. code:: java
+
+    RouteBuilder builder = new RouteBuilder() {
+        public void configure() {
+            errorHandler(deadLetterChannel("mock:error"));
+     
+            from("direct:a")
+                .choice()
+                    .when(header("foo").isEqualTo("bar"))
+                        .to("direct:b")
+                    .when(header("foo").isEqualTo("cheese"))
+                        .to("direct:c")
+                    .otherwise()
+                        .to("direct:d");
+        }
+    };
+    
+DSL ist hierbei der Ausdruck welcher mit dem Aufruf der Methode anfängt. 
+                
+Mit *fluid builder* lassen sich Strukturen wie Router einfach und in Java Code umsetzen. 
+Camel bietet noch einige andere wege die zum gleichen Ziel führen. So sieht etwa die gleiche
+Struktur als XML aus:
+
+.. code:: XML
+
+    <camelContext errorHandlerRef="errorHandler" xmlns="http://camel.apache.org/schema/spring">
+        <route>
+            <from uri="direct:a"/>
+            <choice>
+                <when>
+                    <xpath>$foo = 'bar'</xpath>
+                    <to uri="direct:b"/>
+                </when>
+                <when>
+                    <xpath>$foo = 'cheese'</xpath>
+                    <to uri="direct:c"/>
+                </when>
+                <otherwise>
+                    <to uri="direct:d"/>
+                </otherwise>
+            </choice>
+        </route>
+    </camelContext>
+
 =======
 Quellen
 =======
@@ -180,3 +230,7 @@ Quellen
 [2] Enterprise Integration Patterns; G.Hohpe, B.Woolf; 2003; Online: http://www.enterpriseintegrationpatterns.com/toc.html; abgerufen 27.02.2014
 
 [3] Extract Transform Load (ETL) Example; Apache Camel; Online: http://camel.apache.org/etl-example.html; abgerufen 27.02.2014
+
+[4] Java DSL; Apache Camel; Online: https://camel.apache.org/java-dsl.html; abgerufen 27.02.2014
+
+
