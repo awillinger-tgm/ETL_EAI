@@ -220,6 +220,41 @@ Struktur als XML aus:
             </choice>
         </route>
     </camelContext>
+    
+~~~~~~~~~~~~~~
+Type Converter
+~~~~~~~~~~~~~~
+
+Es wird ein TypeConverter verwendet um PersonDocument nach CustomerEntity umzuwandeln. 
+Der Converter ist durch die Annotation ``Converter`` markiert. 
+
+.. code:: java
+
+    @Converter
+    public static CustomerEntity toCustomer(PersonDocument doc, Exchange exchange) throws Exception {
+        EntityManager entityManager = exchange.getIn().getHeader(JpaConstants.ENTITYMANAGER, EntityManager.class);
+        TransactionTemplate transactionTemplate = exchange.getContext().getRegistry().lookupByNameAndType("transactionTemplate", TransactionTemplate.class);
+
+        String user = doc.getUser();
+        CustomerEntity customer = findCustomerByName(transactionTemplate, entityManager, user);
+
+        // let's convert information from the document into the entity bean
+        customer.setUserName(user);
+        customer.setFirstName(doc.getFirstName());
+        customer.setSurname(doc.getLastName());
+        customer.setCity(doc.getCity());
+
+        LOG.info("Created object customer: {}", customer);
+        return customer;
+    }
+    
+Code aus ``org.apache.camel.example.etl.CustomerTransformer``.
+
+
+
+
+
+
 
 =======
 Quellen
@@ -233,4 +268,5 @@ Quellen
 
 [4] Java DSL; Apache Camel; Online: https://camel.apache.org/java-dsl.html; abgerufen 27.02.2014
 
+[5] Type Converter; Apache Camel; Online: https://camel.apache.org/type-converter.html; abgerufen 27.02.2014
 
