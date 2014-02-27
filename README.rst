@@ -250,12 +250,29 @@ Der Converter ist durch die Annotation ``Converter`` markiert.
     
 Code aus ``org.apache.camel.example.etl.CustomerTransformer``.
 
+~~~~~~~~
+Messages
+~~~~~~~~
 
+.. image:: http://www.enterpriseintegrationpatterns.com/img/MessageSolution.gif
+    :width: 70%
 
+Bei einer Message wird eine Information über eine Route geführt. 
 
+Im Beispielcode wurde die Route mit der *fluid builder* DSL bestimmt.
 
+.. code:: java
 
+    from("file:src/data?noop=true")
+        .convertBodyTo(PersonDocument.class)
+        .to("jpa:org.apache.camel.example.etl.CustomerEntity");
 
+    // the following will dump the database to files
+    from("jpa:org.apache.camel.example.etl.CustomerEntity?consumeDelete=false&delay=3000&consumeLockEntity=false")
+        .setHeader(Exchange.FILE_NAME, el("${in.body.userName}.xml"))
+        .to("file:target/customers");
+
+ 
 =======
 Quellen
 =======
@@ -270,3 +287,4 @@ Quellen
 
 [5] Type Converter; Apache Camel; Online: https://camel.apache.org/type-converter.html; abgerufen 27.02.2014
 
+[6] Messages; Apache Camel; Online: https://camel.apache.org/message.html; abgerufen 27.02.2014
